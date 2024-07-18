@@ -12,7 +12,7 @@ Nest з системою модулів які легко можна забра�
 ![image](https://github.com/user-attachments/assets/9bb9c4ed-e2ec-41f9-bb59-a638da960187)
 
 Hа прикладі UserModule metod user/id/editRole для видання ролі </br>
-на прикладі UserModule metod user/id/ban для видання бану
+на прикладі UserModule metod user/id/ban для видання бану</br>
 на прикладі UserModule metod user/id/getPremium для видання преміуму тому хто купив
 та сама логіка з типами аналогічно гвард type.guard в auth/guards
 
