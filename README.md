@@ -1,73 +1,86 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+Вітаю та дякую, що перевіряєте дану роботу та читаєте це 
+Вмикається усе як на занняттях, а саме 
+1.інсталяція всіх бібліотек
+2.start:docker:db в packege.json (можливо прокинути міграції якщо воно не підтягне базу даних )
+3.start:local в packege.json 
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+База даних Postgress щоб легко додатись до вже існуючої
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Nest з системою модулів які легко можна забрати і додати щоб проект був адаптивний
 
-## Description
+Логіка ролей була задумана  створенням та використанням окремого role.guard в auth/guards 
+![image](https://github.com/user-attachments/assets/9bb9c4ed-e2ec-41f9-bb59-a638da960187)
+на прикладі UserModule metod user/id/editRole для видання ролі 
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+на прикладі UserModule metod user/id/ban для видання бану
 
-## Installation
+на прикладі UserModule metod user/id/getPremium для видання преміуму тому хто купив
 
-```bash
-$ npm install
-```
 
-## Running the app
+та сама логіка з типами аналогічно гвард type.guard в auth/guards
+![image](https://github.com/user-attachments/assets/b292d39c-fd8c-4937-bfb3-05e1941daa24)
+на прикладі CarModule metod car/id/stats - для отримання статистики 
 
-```bash
-# development
-$ npm run start
 
-# watch mode
-$ npm run start:dev
+<<!!! Технічний експерт запропонував зробити це через систему пермішинів>> через ця 
+зроблена для того щоб можна було повісити на будь який метод будь-яке обмеження використовуючи UseGuards
+я добавив тільки в делька методів їх можна навішати багато куди за потреби замовника
 
-# production mode
-$ npm run start:prod
-```
 
-## Test
+логіка додання AWS - додана як загрузка фотографій в оголошення подібно як показувалось на занняттях є file-storage module зі всіма функціями 
 
-```bash
-# unit tests
-$ npm run test
+перевірка на нецензурну лексику була виконана методом containsInappropriateLanguage який приймає dto в carRepository. Викликається при створення оголошення 
+дає статус isActive і також далі виконується пункт 
+<<Кожне оголошення проходить перевірку на нецензурну лексику автоматично.
+Якщо платформа не знайшла підозрілої лексики, то воно переходить в статус активного і попадає в на платформу. Якщо платформа знаходить не відповідні слова, то система пропонує редагувати оголошення. Продавець може редагувати оголошення лише 3 рази. Якщо за 3 рази оголошення не проходить, то воно попадає в статус не активного. При цьому буде надіслано лист для менеджера для перевірки.>> в updateCar та createCar
 
-# e2e tests
-$ npm run test:e2e
 
-# test coverage
-$ npm run test:cov
-```
 
-## Support
+<<4. Інформація про оголошення
+	Платформа не надає інформації по оголошенню для продавця з аккаунтом “Базовий”. Якщо у продавця акаунт типу “Преміум”, то платформа надає йому наступні дані:
+	* кількість переглядів оголошення
+	* кількість переглядів за день, тиждень, місяць
+	* Середню ціну на авто по регіону продажу авто.
+Наприклад якщо авто продається у Києві, то буде середня ціна авто по Києву.
+Якщо у Львівській області, то середня ціна буде по Львівській області
+	* середня ціна авто по цілій Україні>>
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+логіка переглядів зроблена в модулі views і реалізовувалася при кліку на getCar 
+Ця інформація доступна тільки для ПРЕМІУМ викноється в функції  getStats(carId: string) в КарСервісі на основі таблиці view та інформації в таблиці кар
+Одразу скажу можна було зробити лакаонічніше і розділити на КарРепозіторі це все однак пишу в бібліотеці,дуже тяжко х умовами в подальшому буду писати методи краще обіця. 
 
-## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+<<Клієнт може створити цінник в таких валютах USD, EUR, UAH. Ціна вказується лише в одній з валют. Решта валют вираховується по курсу приватбанку. Ціни оновлюються раз в день. Обов'язково вказувати по якому курсу ми робили підрахунок, та яку ціну вказував юзер при викладенні оголошення. >>
+Реалізовано - дужу гарний метод і модуль - добре вийшло
 
-## License
+задумка валют реаліхована в модлі EXCHANGE  в діставанні з апі приватБанку відповідних полів і колонки Currency а також price з  car.dto 
+https://api.privatbank.ua/p24api/pubinfo?exchange&coursid=5 
+а також добавлянням в відповідь РеспонсКар таблиця EXCHANGE приблизно як на фото 
+![image](https://github.com/user-attachments/assets/0ba4681a-61ed-42d4-ad33-80113b1473e6)
 
-Nest is [MIT licensed](LICENSE).
+Реалізовано пошук в запиті ГетКарс
+![image](https://github.com/user-attachments/assets/fb210e2e-1b81-4846-b355-439a16333c56)
+
+
+
+Реалізовано ban користувачів До якого має доступ тільки Юзер з Роллю Адміністратор та для цього створенна окрема таблиця   
+![image](https://github.com/user-attachments/assets/a6969ce9-9796-4eb2-afb3-9450b8a10e8c)
+
+
+
+<<!!! Клієнт заікнувся про автосалони. В майбутньому на платформу планується вихід не лише одиночних продавцій, а також автосалонів зі своїм менеджерами, адмінами, сейлами, механіками. Необхідно це врахувати при побудові архітектури.>>
+додані Автосалони 
+![image](https://github.com/user-attachments/assets/e47b4f28-b1c0-451b-9086-1b4d4a8b2d18)
+поки що з такими полями 
+![image](https://github.com/user-attachments/assets/97a5af10-136f-49d9-8bd9-38b677416f02)
+запис з бази даних. Також усе додається і пов'язано з іншими таблицями для того щоб легко витягнути 
+
+
+Зареєстрований продавець може виставити своє на продаж. Якщо у  продавця аккаунт типу “Базовий”, то він може викласти лише одне авто на продаж. Якщо тип преміум, то кількість авто не обмеження.
+Реалізовано ![image](https://github.com/user-attachments/assets/6416c971-36a6-4980-bfb7-da214a414dc3)
+
+
+
+
+
+
