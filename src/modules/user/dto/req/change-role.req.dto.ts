@@ -1,6 +1,7 @@
-import { IsString } from 'class-validator';
+import {IsEnum, IsString } from 'class-validator';
+import { UserRole } from 'src/database/entities/enums/role.enum';
 
 export class ChangeRoleReqDto {
-  @IsString({ message: 'Write a role' })
-  role: string;
+  @IsEnum(UserRole, { message: 'Write a role' })
+  role: UserRole;
 }

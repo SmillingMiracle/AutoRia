@@ -1,8 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsOptional, IsString, Length, Matches } from 'class-validator';
+import {IsEnum, IsOptional, IsString, Length, Matches } from 'class-validator';
 
 import { TransformHelper } from '../../../../common/helpers/transform.helper';
+import { UserRole } from 'src/database/entities/enums/role.enum';
+import { UserType } from 'src/database/entities/enums/type.enum';
 
 export class BaseUserReqDto {
   @ApiProperty({ example: 'Naruto' })
@@ -13,15 +15,15 @@ export class BaseUserReqDto {
   @Type(() => String)
   name?: string;
 
-  @ApiProperty({ example: 'USER' })
+  @ApiProperty({ enum: ['USER', 'MODERATOR', 'ADMIN']})
   @IsOptional()
-  @IsString()
+  @IsEnum(UserRole)
   @Length(3, 10)
   role: string;
 
-  @ApiProperty({ example: 'BASE' })
+  @ApiProperty({ enum: ['BASE', 'PREMIUM']})
   @IsOptional()
-  @IsString()
+  @IsEnum(UserType)
   @Length(3, 10)
   type: string;
 

@@ -9,6 +9,7 @@ import { MessageEntity } from './message.entity';
 import { BaseModel } from './models/base.model';
 import { RefreshTokenEntity } from './refresh-token.entity';
 import { ViewEntity } from './view.entity';
+import { UserType } from './enums/type.enum';
 
 @Entity({ name: TableNameEnum.USERS })
 export class UserEntity extends BaseModel {
@@ -21,11 +22,11 @@ export class UserEntity extends BaseModel {
   @Column('text', { select: false })
   password: string;
 
-  @Column({ type: 'text', enum: UserRole, default: UserRole.USER })
-  role: string;
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  role: UserRole;
 
-  @Column('text', { nullable: true })
-  type: string;
+  @Column({ type: 'enum', enum: UserType, default: UserType.BASE })
+  type: UserType;
 
   @OneToMany(() => RefreshTokenEntity, (entity) => entity.user)
   refreshTokens?: RefreshTokenEntity[];

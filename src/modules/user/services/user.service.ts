@@ -13,6 +13,8 @@ import { ChangeRoleReqDto } from '../dto/req/change-role.req.dto';
 import { UpdateUserReqDto } from '../dto/req/update-user.req.dto';
 import { UserResDto } from '../dto/res/user.res.dto';
 import { UserMapper } from './user.mapper';
+import { UserRole } from 'src/database/entities/enums/role.enum';
+import { UserType } from 'src/database/entities/enums/type.enum';
 
 @Injectable()
 export class UserService {
@@ -32,7 +34,12 @@ export class UserService {
     dto: UpdateUserReqDto,
   ): Promise<UserResDto> {
     const user = await this.userRepository.findOneBy({ id: userData.userId });
-    const updatedUser = await this.userRepository.save({ ...user, ...dto });
+    const updatedUser = await this.userRepository.save({
+      ...user,
+      ...dto,
+      role: dto.role ? UserRole[dto.role as keyof typeof UserRole] : user.role,
+      type: dto.type ? UserType[dto.type as keyof typeof UserType] : user.type
+    });
     return UserMapper.toResponseDTO(updatedUser);
   }
 
@@ -85,7 +92,7 @@ export class UserService {
     // Оновлення ролі користувача на 'BANNED'
     const bannedUser = await this.userRepository.save({
       ...user,
-      role: 'BANNED',
+      role: UserRole.BANNED,
     });
     console.log(bannedUser);
     return UserMapper.toResponseDTO(bannedUser);
@@ -98,7 +105,8 @@ export class UserService {
     }
     const updatedUser = await this.userRepository.save({
       ...user,
-      type: 'PREMIUM',
+      // Оновлення типу користувача на 'Premium'
+      type: UserType.PREMIUM,
     });
     console.log(updatedUser);
     return UserMapper.toResponseDTO(updatedUser);

@@ -12,6 +12,8 @@ import { IUserData } from '../interfaces/user-data.interface';
 import { AuthMapper } from './auth.mapper';
 import { AuthCacheService } from './auth-cache.service';
 import { TokenService } from './token.service';
+import { UserRole } from '../../../database/entities/enums/role.enum';
+import { UserType } from '../decorators/type-user.decorator';
 
 @Injectable()
 export class AuthService {
@@ -28,7 +30,7 @@ export class AuthService {
 
     const password = await bcrypt.hash(dto.password, 10);
     const user = await this.userRepository.save(
-      this.userRepository.create({ ...dto, password }),
+      this.userRepository.create({ ...dto, password, role: UserRole[dto.role], type: UserType[dto.type]}),
     );
     const pair = await this.tokenService.generateAuthTokens({
       userId: user.id,
