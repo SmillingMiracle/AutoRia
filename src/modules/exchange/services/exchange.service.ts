@@ -1,31 +1,25 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  OnModuleInit,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, OnModuleInit } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 import { Cron } from '@nestjs/schedule';
-import fetch from 'node-fetch';
-
 import { ExchangeEntity } from '../../../database/entities/exchange.entity';
 import { LoggerService } from '../../logger/logger.service';
-import { CarRepository } from '../../repository/services/car.repository';
 import { ExchangeRepository } from '../../repository/services/exchange.repository';
-import { UserRepository } from '../../repository/services/user.repository';
-import { ViewRepository } from '../../repository/services/view.repository';
 import { ExchangeResDto } from '../dto/res/exchange.res.dto';
 import { ExchangeMapper } from './exchange.mapper';
+import { ConfigService } from '@nestjs/config';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class ExchangeService implements OnModuleInit {
   constructor(
-    private readonly logger: LoggerService,
-    private readonly exchangeRepository: ExchangeRepository,
+      private readonly logger: LoggerService,
+      private readonly exchangeRepository: ExchangeRepository,
+      private readonly httpService: HttpService,
+      private readonly configService: ConfigService,
   ) {}
 
   private exchangeRates: { [key: string]: number } = {};
 
-  //оновляється переде використанням
   async onModuleInit() {
     await this.updateExchangeRates();
   }
@@ -33,22 +27,17 @@ export class ExchangeService implements OnModuleInit {
   @Cron('0 0 * * *') // Виконується щоденно опівночі
   async updateExchangeRates() {
     try {
-      const response = await fetch(
-        'https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5',
+      const apiUrl = this.configService.get<string>('PRIVATBANK_API_URL');
+      const response = await lastValueFrom(
+          this.httpService.get(`${apiUrl}pubinfo?json&exchange&coursid=5`),
       );
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
+      const data = response.data;
       data.forEach((rate) => {
         this.exchangeRates[rate.ccy] = parseFloat(rate.buy);
       });
     } catch (error) {
       console.error('Failed to fetch exchange rates:', error);
-      throw new HttpException(
-        'Failed to fetch exchange rates',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Failed to fetch exchange rates', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -64,10 +53,7 @@ export class ExchangeService implements OnModuleInit {
     return this.thisId;
   }
 
-  async createExchange(
-    price: string,
-    currency: string,
-  ): Promise<ExchangeResDto> {
+  async createExchange(price: string, currency: string): Promise<ExchangeResDto> {
     const originalPrice = parseFloat(price);
     const originalCurrency = currency.toUpperCase();
 
@@ -96,17 +82,18 @@ export class ExchangeService implements OnModuleInit {
       default:
         throw new Error('Unsupported currency');
     }
+
     const savedExchange = await this.exchangeRepository.save(
-      this.exchangeRepository.create({
-        originalPrice,
-        originalCurrency,
-        priceInUSD: parseInt(priceInUSD.toString()),
-        priceInEUR: parseInt(priceInEUR.toString()),
-        priceInUAH: parseInt(priceInUAH.toString()),
-        exchangeRateUSD: parseInt(exchangeRateUSD.toString()),
-        exchangeRateEUR: parseInt(exchangeRateEUR.toString()),
-        exchangeRateUAH: parseInt(exchangeRateUAH.toString()),
-      }),
+        this.exchangeRepository.create({
+          originalPrice,
+          originalCurrency,
+          priceInUSD: parseInt(priceInUSD.toString()),
+          priceInEUR: parseInt(priceInEUR.toString()),
+          priceInUAH: parseInt(priceInUAH.toString()),
+          exchangeRateUSD: parseInt(exchangeRateUSD.toString()),
+          exchangeRateEUR: parseInt(exchangeRateEUR.toString()),
+          exchangeRateUAH: parseInt(exchangeRateUAH.toString()),
+        }),
     );
     this.thisId = savedExchange.id;
     return ExchangeMapper.toResponseDTO(savedExchange);
