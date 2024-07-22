@@ -1,9 +1,9 @@
 Вітаю та дякую, що перевіряєте дану роботу та читаєте це 
 Вмикається усе як на занняттях, а саме:</br>
 
-1.інсталяція всіх бібліотек - npm install  </br>
-2. start:docker:db в packege.json</br>
-3.start:local в packege.json </br>
+1. npm install - інсталяція всіх бібліотек </br>
+2. start:docker:db  - в packege.json підйом бази даних, редісу, самої аплікації </br>
+3. start:local - в packege.json  використає locacl.env для запуску та роботи апки </br>
 
 База даних Postgress щоб легко додатись до вже існуючої
 
